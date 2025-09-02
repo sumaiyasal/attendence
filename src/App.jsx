@@ -49,7 +49,7 @@ function App() {
               <Menu size={28} />
             </button>
           )}
-          <h1 className="text-xl font-bold text-gray-700">Employee Dashboard</h1>
+      
         </header>
 
         {/* Dashboard Content */}
