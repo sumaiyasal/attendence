@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
 
-export default function EmployeeSummaryTable() {
+export default function EmployeeSummaryTable({filter}) {
   const [data, setData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    // Replace with backend API
-    fetch("http://localhost:5000/employee-summary")
-      .then((res) => res.json())
-      .then((json) => setData(json));
-  }, []);
+useEffect(() => {
+    const fetchData = async () => {
+        const query = new URLSearchParams();
+        if (filter?.year) query.append("year", filter.year);
+        if (filter?.months?.length) query.append("months", filter.months.join(","));
+        const res = await fetch(`http://localhost:5000/employee-summary?${query.toString()}`);
+        if (!res.ok) throw new Error("Network response was not ok");
+        const result = await res.json();
+        setData(result);
+    };
+
+    fetchData();
+  }, [filter]);
 
   // Sorting
   const sortedData = [...data].sort((a, b) => {
@@ -36,8 +43,6 @@ export default function EmployeeSummaryTable() {
 
   return (
     <div className="p-6 bg-white shadow-xl rounded-2xl">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Employee Summary</h2>
-
       {/* Search */}
       <div className="mb-4 flex justify-between items-center">
         <input

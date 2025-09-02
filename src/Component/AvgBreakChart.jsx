@@ -3,20 +3,28 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-const AvgBreakChart = () => {
+const AvgBreakChart = ({filter}) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/avg-break-per-month")
-      .then(res => res.json())
-      .then(data => {
-        const chartData = data.map(item => ({
+    const fetchData = async () => {
+        // Build query params from filter
+        const query = new URLSearchParams();
+        if (filter?.year) query.append("year", filter.year);
+        if (filter?.months?.length) query.append("months", filter.months.join(","));
+        const res = await fetch(`http://localhost:5000/avg-break-per-month?${query.toString()}`);
+        if (!res.ok) throw new Error("Network response was not ok");
+        const result = await res.json();
+        const chartData = result.map(item => ({
           month: monthNames[item.month - 1],
           avgBreak: item.avgBreakHours
         }));
         setData(chartData);
-      });
-  }, []);
+      
+    };
+
+    fetchData();
+  }, [filter]);
 
   return (
     <ResponsiveContainer width="50%" height={300}>

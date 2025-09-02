@@ -7,19 +7,36 @@ import TotalBreakChart from './TotalBreakChart';
 import WorkingHoursTables from './WorkingHoursTables';
 import EmployeeSummaryTable from './EmployeeSummaryTable';
 
-const Content = () => {
+const Content = ({filter}) => {
     const [stats, setStats] = useState({
     totalEmployees: 0,
     avgLoginTime: "--:--",
     avgLogoutTime: "--:--",
     avgWorkHours: "0"
   });
+  console.log(filter);
 
-  useEffect(() => {
-    axios.get("http://localhost:5000/dashboard-stats")
-      .then(res => setStats(res.data))
-      .catch(err => console.error(err));
-  }, []);
+ useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let url = "http://localhost:5000/dashboard-stats";
+        if (filter && (filter.months?.length || filter.year)) {
+          const query = new URLSearchParams();
+          if (filter.year) query.append("year", filter.year);
+          if (filter.months?.length) query.append("months", filter.months.join(","));
+          url += "?" + query.toString();
+        }
+        console.log(url);
+        const res = await axios.get(url);
+        setStats(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, [filter]);
+
     return (
         <div className='container mx-auto'>
             <div>
@@ -53,8 +70,8 @@ const Content = () => {
           <p className='text-xl'>Monthly Overtime(Hours)</p>
                 </div>
                 <div className='flex'>
-                <MonthlyHoursChart></MonthlyHoursChart>
-               <MonthlyOvertimePie></MonthlyOvertimePie>
+                <MonthlyHoursChart filter={filter}></MonthlyHoursChart>
+               <MonthlyOvertimePie filter={filter}></MonthlyOvertimePie>
                 
                 </div>
                
@@ -66,17 +83,17 @@ const Content = () => {
           <p className='text-xl'>Total Break Per Month</p>
                 </div>
                 <div className='flex'>
-                <AvgBreakChart></AvgBreakChart>
-               <TotalBreakChart></TotalBreakChart>
+                <AvgBreakChart filter={filter}></AvgBreakChart>
+               <TotalBreakChart filter={filter}></TotalBreakChart>
                 
                 </div>
                
                 </div>
-                <WorkingHoursTables></WorkingHoursTables>
+                <WorkingHoursTables filter={filter}></WorkingHoursTables>
                  <div className='bg-blue-100 p-4 my-4 rounded-xl border-l-8 border-l-blue-400'>
                 <p className='text-xl font-bold'>Employee Summary</p>
             </div>
-            <EmployeeSummaryTable></EmployeeSummaryTable>
+            <EmployeeSummaryTable filter={filter}></EmployeeSummaryTable>
         </div>
     );
 };

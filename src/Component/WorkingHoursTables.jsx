@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from "react";
 
-const WorkingHoursTables = () => {
+const WorkingHoursTables = ({filter}) => {
   const [topData, setTopData] = useState([]);
   const [bottomData, setBottomData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/top-working-hours")
-      .then(res => res.json())
-      .then(setTopData);
+    const fetchData = async () => {
+        const query = new URLSearchParams();
+        if (filter?.year) query.append("year", filter.year);
+        if (filter?.months?.length) query.append("months", filter.months.join(","));
+        const [topRes, bottomRes] = await Promise.all([
+          fetch(`http://localhost:5000/top-working-hours?${query.toString()}`),
+          fetch(`http://localhost:5000/bottom-working-hours?${query.toString()}`)
+        ]);
+        if (!topRes.ok || !bottomRes.ok) throw new Error("Failed to fetch data");
+        const [topResult, bottomResult] = await Promise.all([topRes.json(), bottomRes.json()]);
+        setTopData(topResult);
+        setBottomData(bottomResult);
+    };
 
-    fetch("http://localhost:5000/bottom-working-hours")
-      .then(res => res.json())
-      .then(setBottomData);
-  }, []);
+    fetchData();
+  }, [filter]);
+
 
   const renderTable = (data, title, color) => (
     <div className="w-full md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden">

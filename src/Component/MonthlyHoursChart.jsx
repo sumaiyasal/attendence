@@ -1,29 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const MonthlyHoursChart = () => {
+const MonthlyHoursChart = ({filter}) => {
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    
-    fetch("http://localhost:5000/employee-monthly-hours")
-      .then((res) => res.json())
-      .then((data) => {
-        const monthMap = {};
-        data.forEach((item) => {
-          const month = item.month;
-          if (!monthMap[month]) monthMap[month] = 0;
-          monthMap[month] += item.totalWorkHours;
-        });
+ useEffect(() => {
+    const fetchData = async () => {
+      const query = new URLSearchParams();
+      if (filter?.year) query.append("year", filter.year);
+      if (filter?.months?.length) query.append("months", filter.months.join(","));
 
-        const chartData = Object.keys(monthMap).map((month) => ({
-          month,
+      const res = await fetch(`http://localhost:5000/employee-monthly-hours?${query.toString()}`);
+      const result = await res.json();
+
+      const monthMap = {};
+      result.forEach((item) => {
+        const month = item.month;
+        if (!monthMap[month]) monthMap[month] = 0;
+        monthMap[month] += item.totalWorkHours;
+      });
+
+      const chartData = Object.keys(monthMap)
+        .sort((a, b) => a - b)
+        .map((month) => ({
+          month: parseInt(month),
           totalHours: monthMap[month],
         }));
 
-        setData(chartData);
-      });
-  }, []);
+      setData(chartData);
+    };
+
+    fetchData();
+  }, [filter]);
 
   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 

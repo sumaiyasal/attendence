@@ -1,7 +1,6 @@
 const FilterBar = ({ filter, setFilter }) => {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const years = [2024, 2025];
-
   const toggleMonth = (month) => {
     const newMonths = filter.months.includes(month)
       ? filter.months.filter(m => m !== month)

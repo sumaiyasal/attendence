@@ -5,21 +5,44 @@ const COLORS = ["#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE"
 
 const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-const MonthlyOvertimePie = () => {
+const MonthlyOvertimePie = ({filter}) => {
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/monthly-overtime")
-      .then(res => res.json())
-      .then(data => {
-        // Convert month number to month name
-        const chartData = data.map(item => ({
-          name: monthNames[item.month - 1],
-          value: item.totalOvertime
-        }));
+useEffect(() => {
+    const fetchData = async () => {
+        // Build query params from filter
+        const query = new URLSearchParams();
+        if (filter?.year) query.append("year", filter.year);
+        if (filter?.months?.length) query.append("months", filter.months.join(","));
+
+        const res = await fetch(`http://localhost:5000/employee-monthly-hours?${query.toString()}`);
+        if (!res.ok) throw new Error("Network response was not ok");
+
+        const result = await res.json();
+
+        // Aggregate totalWorkHours per month
+        const monthMap = {};
+        result.forEach((item) => {
+          const month = item.month;
+          if (!monthMap[month]) monthMap[month] = 0;
+          monthMap[month] += item.totalWorkHours;
+        });
+
+        // Convert to chart data
+        const chartData = Object.keys(monthMap)
+          .sort((a, b) => a - b)
+          .map((month) => ({
+            name: monthNames[parseInt(month) - 1],
+            value: monthMap[month],
+          }));
+
         setData(chartData);
-      });
-  }, []);
+      
+    };
+
+    fetchData();
+  }, [filter]);
+
 
   return (
     <ResponsiveContainer width="60%" height={400}>

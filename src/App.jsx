@@ -11,7 +11,6 @@ function App() {
 
   // Filter state
   const [filter, setFilter] = useState({ months: [], year: "" });
-
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
