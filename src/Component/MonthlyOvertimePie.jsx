@@ -8,28 +8,29 @@ const MonthlyOvertimePie = ({ filter }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const query = new URLSearchParams();
-        if (filter?.year) query.append("year", filter.year);
-        if (filter?.months?.length) query.append("months", filter.months.join(","));
+  const fetchData = async () => {
+    try {
+      const query = new URLSearchParams();
+      if (filter?.year) query.append("year", filter.year);
+      if (filter?.months?.length) query.append("months", filter.months.join(","));
 
-        const res = await fetch(`http://localhost:5000/monthly-overtime?${query.toString()}`);
-        const result = await res.json();
+      const res = await fetch(`http://localhost:5000/monthly-overtime?${query.toString()}`);
+      const result = await res.json();
 
-        const chartData = result.map(item => ({
-          name: monthNames[item.month - 1],
-          value: item.totalOvertime
-        }));
+      const chartData = (Array.isArray(result) ? result : []).map(item => ({
+        name: monthNames[item.month - 1],
+        value: item.totalOvertime
+      }));
 
-        setData(chartData);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+      setData(chartData);
+    } catch (err) {
+      console.error(err);
+      setData([]); // fallback to empty array
+    }
+  };
 
-    fetchData();
-  }, [filter]);
+  fetchData();
+}, [filter]);
 
   return (
     <ResponsiveContainer width="50%" height={400}>
