@@ -29,10 +29,10 @@ useEffect(() => {
   });
 
   // Filtering
-  const filteredData = sortedData.filter((item) =>
-    item.employee.toLowerCase().includes(search.toLowerCase())
-  );
-
+const filteredData = sortedData.filter(
+  (item) =>
+    (item.employee || '').toLowerCase().includes(search.toLowerCase())
+);
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {

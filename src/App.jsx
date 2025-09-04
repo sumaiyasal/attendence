@@ -12,13 +12,13 @@ function App() {
   // Filter state
   const [filter, setFilter] = useState({ months: [], year: "" });
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
       <aside
         className={`
           fixed top-0 left-0 h-full bg-gradient-to-b from-blue-600 to-blue-800 text-white z-40
-          w-64 transform transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          w-64 transform transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200
+          ${isOpen ? "translate-x-0" : "-translate-x-full "}
         `}
       >
         {/* Sidebar Header */}

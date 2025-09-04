@@ -14,7 +14,6 @@ const Content = ({filter}) => {
     avgLogoutTime: "--:--",
     avgWorkHours: "0"
   });
-  console.log(filter);
 
  useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +25,6 @@ const Content = ({filter}) => {
           if (filter.months?.length) query.append("months", filter.months.join(","));
           url += "?" + query.toString();
         }
-        console.log(url);
         const res = await axios.get(url);
         setStats(res.data);
       } catch (err) {
@@ -38,7 +36,8 @@ const Content = ({filter}) => {
   }, [filter]);
 
     return (
-        <div className='container mx-auto'>
+        <div>
+              <div className='container mx-auto '>
             <div>
             <h1 className='flex justify-center items-center text-4xl font-bold text-purple-700'>Attendence Monitoring Dashboard</h1>
             </div>
@@ -95,6 +94,8 @@ const Content = ({filter}) => {
             </div>
             <EmployeeSummaryTable filter={filter}></EmployeeSummaryTable>
         </div>
+        </div>
+      
     );
 };
 

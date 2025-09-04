@@ -15,7 +15,7 @@ useEffect(() => {
         if (filter?.year) query.append("year", filter.year);
         if (filter?.months?.length) query.append("months", filter.months.join(","));
 
-        const res = await fetch(`http://localhost:5000/employee-monthly-hours?${query.toString()}`);
+        const res = await fetch(`http://localhost:5000/monthly-overtime?${query.toString()}`);
         if (!res.ok) throw new Error("Network response was not ok");
 
         const result = await res.json();
