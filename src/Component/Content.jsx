@@ -39,7 +39,7 @@ const Content = ({filter}) => {
         <div>
               <div className='container mx-auto '>
             <div>
-            <h1 className='flex justify-center items-center text-4xl font-bold text-purple-700'>Attendence Monitoring Dashboard</h1>
+            <h1 className='flex justify-center items-center text-4xl font-bold text-blue-700'>Attendence Monitoring Dashboard</h1>
             </div>
             <div className='bg-blue-100 p-4 my-4 rounded-xl border-l-8 border-l-blue-400'>
                 <p className='text-xl font-bold'>Key Metrics</p>
