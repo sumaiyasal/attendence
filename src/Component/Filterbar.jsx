@@ -1,8 +1,24 @@
+import { useEffect, useState } from "react";
 import CSVUpload from "./CSVUpload";
 
 const FilterBar = ({ filter, setFilter }) => {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const years = [2024, 2025];
+  // const years = [2024, 2025];
+  const[years,setYears]=useState([]);
+  useEffect(() => {
+  const fetchYears = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/attendance-years");
+      const data = await res.json();
+      setYears(data); // data is an array now
+    } catch (err) {
+      console.error("Failed to fetch years:", err);
+    }
+  };
+
+  fetchYears();
+}, []);
+
 
   const toggleMonth = (month) => {
     const newMonths = filter.months.includes(month)
