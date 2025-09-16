@@ -15,12 +15,11 @@ const ExportCSV = ({ filter }) => {
       if (filter.year) params.append("years", filter.year);
       filter.months?.forEach((month) => params.append("months", month));
       filter.employees?.forEach((emp) => params.append("employees", emp));
-
       const url = `${import.meta.env.VITE_API_URL}/api/export?${params.toString()}`;
 
       // Fetch CSV with auth token
       const res = await axios.get(url, {
-        headers: {
+        headers:{
           Authorization: `Bearer ${token}`,
         },
         responseType: "blob", // Important for file download
