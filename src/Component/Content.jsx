@@ -6,6 +6,7 @@ import AvgBreakChart from './AvgBreakChart';
 import TotalBreakChart from './TotalBreakChart';
 import WorkingHoursTables from './WorkingHoursTables';
 import EmployeeSummaryTable from './EmployeeSummaryTable';
+import ExportCSV from './ExportCSV';
 
 const Content = ({filter}) => {
     const [stats, setStats] = useState({
@@ -140,12 +141,9 @@ useEffect(() => {
                 <p className='text-[1.3rem] font-[700]'>📋 Employee Summary</p>
             </div>
             <EmployeeSummaryTable filter={filter}></EmployeeSummaryTable>
-            <button
-  onClick={handleExport}
-  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
->
-  Export CSV
-</button>
+<div className="flex justify-center mb-2">
+  <ExportCSV filter={filter} />
+</div>
         </div>
         </div>
       
