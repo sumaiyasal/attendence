@@ -1,39 +1,59 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-const TotalBreakChart = ({filter}) => {
-  const [data, setData] = useState([]);
+const MonthlyHoursChart = ({ filter }) => {
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found. User not logged in.");
+        return;
+      }
         const query = new URLSearchParams();
-        if (filter?.year) query.append("year", filter.year);
-        if (filter?.months?.length) query.append("months", filter.months.join(","));
-        const res = await fetch(`http://localhost:5000/total-break-per-month?${query.toString()}`);
-        if (!res.ok) throw new Error("Network response was not ok");
-        const result = await res.json();
-        const chartData = result.map(item => ({
-          month: monthNames[item.month - 1],
-          totalBreak: item.totalBreakHours
-        }));
-      setData(chartData);
+       if (filter?.year) query.append("years", filter.year);
+        filter?.months?.forEach((month) => query.append("months", month));
+        filter?.employees?.forEach((emp) => query.append("employees", emp));
+        let url = `${import.meta.env.VITE_API_URL}/api/charts?${query.toString()}`; 
+        const response = await axios.get(url,
+           {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+        );
+        setStats(response.data); 
+      } catch (err) {
+        console.error("Error fetching monthly stats:", err);
+      }
     };
+
     fetchData();
   }, [filter]);
 
+  if (!stats) return <p>Loading...</p>;
+
+  // Map API monthlyHours array to chart data
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const data = stats.monthlyBreakHours.map((hours, index) => ({
+    month: monthNames[index],
+    breakHours: hours,
+  }));
+
   return (
-    <ResponsiveContainer width="50%" height={300}>
-      <BarChart data={data}>
+    <ResponsiveContainer width="50%" height={400}>
+      <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="month" />
-        <YAxis label={{ value: "Hours", angle: -90, position: "insideLeft" }} />
+        <YAxis label={{ value: "Total Break Hours", angle: -90, position: "insideLeft" }} />
         <Tooltip />
-        <Bar dataKey="totalBreak" fill="#2563EB" name="Total Break Hours" />
+        <Bar dataKey="breakHours" fill="rgb(139, 155, 255)" name="Break Hours" />
       </BarChart>
     </ResponsiveContainer>
   );
 };
 
-export default TotalBreakChart;
+export default MonthlyHoursChart;

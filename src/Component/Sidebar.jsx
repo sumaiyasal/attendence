@@ -26,7 +26,7 @@ const Sidebar = ({ onFilterChange }) => {
   };
 
   return (
-    <aside className="w-64 bg-gradient-to-b from-blue-600 to-blue-800 text-white h-full p-4">
+    <aside className="w-64 bg-amber-700 text-white h-full p-4">
       <h2 className="text-xl font-bold mb-4">Filters</h2>
 
       <div className="mb-6">

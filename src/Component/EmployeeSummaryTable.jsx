@@ -1,111 +1,80 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-export default function EmployeeSummaryTable({filter}) {
+const EmployeeSummaryTable = ({ filter }) => {
   const [data, setData] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [search, setSearch] = useState("");
 
-useEffect(() => {
-    const fetchData = async () => {
-        const query = new URLSearchParams();
-        if (filter?.year) query.append("year", filter.year);
-        if (filter?.months?.length) query.append("months", filter.months.join(","));
-        const res = await fetch(`http://localhost:5000/employee-summary?${query.toString()}`);
-        if (!res.ok) throw new Error("Network response was not ok");
-        const result = await res.json();
-        setData(result);
-    };
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    fetchData();
-  }, [filter]);
+      if (!token) {
+        console.error("No token found. User not logged in.");
+        return;
+      }
 
-  // Sorting
-  const sortedData = [...data].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    const order = sortConfig.direction === "asc" ? 1 : -1;
-    if (a[sortConfig.key] < b[sortConfig.key]) return -1 * order;
-    if (a[sortConfig.key] > b[sortConfig.key]) return 1 * order;
-    return 0;
-  });
+      const query = new URLSearchParams();
+      if (filter?.year) query.append("years", filter.year);
+      filter?.months?.forEach((month) => query.append("months", month));
+      filter?.employees?.forEach((emp) => query.append("employees", emp));
 
-  // Filtering
-const filteredData = sortedData.filter(
-  (item) =>
-    (item.employee || '').toLowerCase().includes(search.toLowerCase())
-);
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/summary?${query.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
+
+      const normalized = res.data.rows.map((r) => ({
+        id: r.ID,
+        employee: r.Name,
+        totalHours: r["Total Hours"],
+        avgHours: r["Avg Daily Hours"],
+        avgBreak: r["Avg Break (min)"],
+        daysWorked: r["Days Worked"],
+      }));
+
+      setData(normalized);
+    } catch (err) {
+      console.error("Error fetching employee summary:", err);
     }
-    setSortConfig({ key, direction });
   };
 
-  return (
-    <div className="p-6 bg-white shadow-xl rounded-2xl">
-      {/* Search */}
-      <div className="mb-4 flex justify-between items-center">
-        <input
-          type="text"
-          placeholder="🔍 Search employee..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-1/3 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        />
-      </div>
+  fetchData();
+}, [filter]);
 
-      {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="w-full text-sm text-left border-collapse">
-          <thead className="bg-gradient-to-r from-blue-50 to-blue-100 text-gray-700 uppercase text-xs font-semibold">
-            <tr>
-              {[
-                "Employee",
-                "Total Hours",
-                "Avg Hours",
-                "Max Hours",
-                "Min Hours",
-                "Days Worked",
-              ].map((header, idx) => (
-                <th
-                  key={idx}
-                  className="px-6 py-3 cursor-pointer hover:text-blue-600 transition"
-                  onClick={() =>
-                    handleSort(
-                      header.toLowerCase().replace(" ", "").replace(" ", "")
-                    )
-                  }
-                >
-                  {header}
-                  {sortConfig.key ===
-                    header.toLowerCase().replace(" ", "").replace(" ", "") && (
-                    <span className="ml-1">
-                      {sortConfig.direction === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-              ))}
+
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-md mb-4">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-white text-black">
+          <tr>
+            <th className="px-6 py-3 text-left text-lg font-bold">ID</th>
+            <th className="px-6 py-3 text-left text-lg font-bold">Employee</th>
+            <th className="px-6 py-3 text-left text-lg font-bold">Total Hours</th>
+            <th className="px-6 py-3 text-left text-lg font-bold">Avg Daily Hours</th>
+            <th className="px-6 py-3 text-left text-lg font-bold">Avg Break (min)</th>
+            <th className="px-6 py-3 text-left text-lg font-bold">Days Worked</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100 bg-white">
+          {data.map((row) => (
+            <tr key={row.id} className="hover:bg-purple-50 transition duration-200">
+              <td className="px-6 py-3 font-medium text-gray-800">{row.id}</td>
+              <td className="px-6 py-3">{row.employee}</td>
+              <td className="px-6 py-3">{row.totalHours.toFixed(2)}</td>
+              <td className="px-6 py-3">{row.avgHours.toFixed(2)}</td>
+              <td className="px-6 py-3">{row.avgBreak.toFixed(2)}</td>
+              <td className="px-6 py-3">{row.daysWorked}</td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredData.map((row, index) => (
-              <tr
-                key={index}
-                className="hover:bg-blue-50 transition duration-200"
-              >
-                <td className="px-6 py-3 font-medium text-gray-800">
-                  {row.employee}
-                </td>
-                <td className="px-6 py-3">{row.totalHours}</td>
-                <td className="px-6 py-3">{row.avgHours}</td>
-                <td className="px-6 py-3">{row.maxHours}</td>
-                <td className="px-6 py-3">{row.minHours}</td>
-                <td className="px-6 py-3">{row.daysWorked}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
+
+export default EmployeeSummaryTable;

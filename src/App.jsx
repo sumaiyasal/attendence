@@ -3,59 +3,55 @@ import Content from './Component/Content';
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import FilterBar from './Component/Filterbar';
-// import FilterBar from './Component/FilterBar';
+import Navbar from './Navbar';
+import Login from './Component/Login';
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleSidebar = () => setIsOpen(!isOpen);
 
+  // Login state
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
+
   // Filter state
-  const [filter, setFilter] = useState({ months: [], year: "" });
+  const [filter, setFilter] = useState({ months: [], year: "", employees: [] });
+
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
+const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false); 
+  };
   return (
-    <div className="flex h-screen bg-white">
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed top-0 left-0 h-full bg-gradient-to-b from-blue-600 to-blue-800 text-white z-40
-          w-64 transform transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200
-          ${isOpen ? "translate-x-0" : "-translate-x-full "}
-        `}
-      >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-blue-500">
-          <h2 className="text-lg font-bold">Dashboard</h2>
-          <button onClick={toggleSidebar}>
-            <X size={24} />
-          </button>
-        </div>
+    <div>
+      <Navbar isOpen={isOpen} toggleSidebar={toggleSidebar} onLogout={handleLogout} />
 
-        {/* Filters */}
-        <div className="mt-6 px-4">
-          <FilterBar filter={filter} setFilter={setFilter} />
-        </div>
-      </aside>
+      <div className="flex h-screen bg-white mt-16">
+        {/* Sidebar */}
+        <aside
+          className={`
+            fixed left-0 h-full bg-[#f6f8fb] text-black z-40
+            w-64 transform transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 border
+            ${isOpen ? "translate-x-0" : "-translate-x-full "}
+          `}
+        >
+          <div className="mt-6 px-4">
+            <FilterBar filter={filter} setFilter={setFilter} />
+          </div>
+        </aside>
 
-      {/* Main Content */}
-      <div
-        className={`
+        {/* Main Content */}
+        <div className={`
           flex-1 flex flex-col transition-all duration-300 ease-in-out
-          ${isOpen ? "ml-64" : "ml-0"}
-        `}
-      >
-        {/* Top Bar */}
-        <header className="p-4 flex items-center bg-white shadow-md">
-          {!isOpen && (
-            <button className="text-blue-600 mr-4" onClick={toggleSidebar}>
-              <Menu size={28} />
-            </button>
-          )}
-      
-        </header>
-
-        {/* Dashboard Content */}
-        <main className="flex-1 p-6">
-          <Content filter={filter} />
-        </main>
+          bg-[#f6f8fb]
+        `}>
+          <main className={`flex-1 ${isOpen ? "ml-64" : "ml-0"}`}>
+            <Content filter={filter} />
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -1,50 +1,61 @@
 import React, { useEffect, useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import axios from "axios";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE", "#DBEAFE", "#E0F2FE", "#BAE6FD", "#7DD3FC", "#38BDF8", "#0EA5E9"];
 const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-const MonthlyOvertimePie = ({ filter }) => {
-  const [data, setData] = useState([]);
+const MonthlyOvertimeLine = ({ filter }) => {
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
+    const fetchData = async () => {
+      try {
+       const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found. User not logged in.");
+        return;
+      } 
       const query = new URLSearchParams();
-      if (filter?.year) query.append("year", filter.year);
-      if (filter?.months?.length) query.append("months", filter.months.join(","));
+       if (filter?.year) query.append("years", filter.year);
+        filter?.months?.forEach((month) => query.append("months", month));
+        filter?.employees?.forEach((emp) => query.append("employees", emp));
+        let url = `${import.meta.env.VITE_API_URL}/api/charts?${query.toString()}`; 
+        const response = await axios.get(url,
+           {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+        );
+        setStats(response.data); 
+      } catch (err) {
+        console.error("Error fetching monthly stats:", err);
+      }
+    };
 
-      const res = await fetch(`http://localhost:5000/monthly-overtime?${query.toString()}`);
-      const result = await res.json();
+    fetchData();
+  }, [filter]);
 
-      const chartData = (Array.isArray(result) ? result : []).map(item => ({
-        name: monthNames[item.month - 1],
-        value: item.totalOvertime
-      }));
+  if (!stats?.monthlyOvertime) return <p>Loading...</p>;
 
-      setData(chartData);
-    } catch (err) {
-      console.error(err);
-      setData([]); // fallback to empty array
-    }
-  };
-
-  fetchData();
-}, [filter]);
+  const data = stats.monthlyOvertime.map((hours, index) => ({
+    month: monthNames[index],
+    overtime: hours,
+  }));
 
   return (
     <ResponsiveContainer width="50%" height={400}>
-      <PieChart>
-        <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
+      <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="month" />
+        <YAxis label={{ value: "Overtime (hrs)", angle: -90, position: "insideLeft" }} />
         <Tooltip formatter={(value) => `${value.toFixed(2)} hrs`} />
         <Legend />
-      </PieChart>
+        <Line type="monotone" dataKey="overtime" stroke="#9333EA" strokeWidth={3} activeDot={{ r: 6 }} />
+      </LineChart>
     </ResponsiveContainer>
   );
 };
 
-export default MonthlyOvertimePie;
+export default MonthlyOvertimeLine;

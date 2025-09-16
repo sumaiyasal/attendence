@@ -8,10 +8,18 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import Login from './Component/Login.jsx';
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App></App>,
+    children:[
+      {
+        path: "/login",
+       element: <Login></Login>,
+      }
+    ]
   },
 ]);
 createRoot(document.getElementById('root')).render(
