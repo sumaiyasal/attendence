@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import Loading from "./Loading";
 
 const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -38,7 +39,7 @@ const AvgBreakChart = ({filter}) => {
     fetchData();
   }, [filter]);
 
-  if (!stats?.monthlyBreakMinutesAvg) return <p>Loading...</p>;
+  if (!stats?.monthlyBreakMinutesAvg) return <Loading></Loading>;
 
   const data = stats.monthlyBreakMinutesAvg.map((hours, index) => ({
     month: monthNames[index],

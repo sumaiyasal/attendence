@@ -26,7 +26,7 @@ export default function Navbar({ isOpen, toggleSidebar,onLogout }) {
       <div className="w-10 sm:w-12 mr-12" >
          <button
         onClick={onLogout}
-        className="ml-4 px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition"
+        className="ml-4 px-3 py-1 rounded bg-purple-500 text-white hover:bg-purple-600 transition"
       >
         Logout
       </button>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import Loading from "./Loading";
 
 const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -37,7 +38,7 @@ const MonthlyOvertimeLine = ({ filter }) => {
     fetchData();
   }, [filter]);
 
-  if (!stats?.monthlyOvertime) return <p>Loading...</p>;
+  if (!stats?.monthlyOvertime) return <Loading></Loading>;
 
   const data = stats.monthlyOvertime.map((hours, index) => ({
     month: monthNames[index],

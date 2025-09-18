@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import Loading from "./Loading";
 
 const MonthlyHoursChart = ({ filter }) => {
   const [stats, setStats] = useState(null);
@@ -31,7 +32,7 @@ const MonthlyHoursChart = ({ filter }) => {
     fetchData();
   }, [filter]);
 
-  if (!stats) return <p>Loading...</p>;
+  if (!stats) return <Loading></Loading>;
 
   // Map API monthlyHours array to chart data
   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];

@@ -99,8 +99,8 @@ export default function Login({ onLogin }) {
           </p>
 
           {/* Decorative Circles */}
-          <div className="absolute -top-16 -right-16 w-40 h-40 bg-pink-300 rounded-full opacity-50 animate-pulse"></div>
-          <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-purple-300 rounded-full opacity-50 animate-pulse"></div>
+          <div className="absolute -top-16 right-0.5 w-40 h-40 bg-pink-300 rounded-full opacity-50 animate-pulse"></div>
+          <div className="absolute -bottom-16 left-0.5 w-40 h-40  bg-purple-300 rounded-full opacity-50 animate-pulse"></div>
         </motion.form>
       </div>
     </div>
