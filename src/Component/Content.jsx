@@ -115,7 +115,7 @@ useEffect(() => {
 </div>
 
               
-                <div className='flex justify-center items-center gap-96'>
+                <div className='flex'>
                 <MonthlyHoursChart filter={filter}></MonthlyHoursChart>
                 <MonthlyOvertimePie filter={filter}></MonthlyOvertimePie> 
                 </div>
@@ -131,7 +131,7 @@ useEffect(() => {
     <p className="text-xl font-semibold">Total Break Hours Per Month</p>
   </div>
 </div>
-                <div className='flex justify-center items-center gap-96'>
+                <div className='flex'>
                 <AvgBreakChart filter={filter}></AvgBreakChart>
                <TotalBreakChart filter={filter}></TotalBreakChart> 
                 </div>            
