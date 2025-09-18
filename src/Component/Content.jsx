@@ -15,6 +15,7 @@ const Content = ({filter}) => {
     avgLogoutTime: "--:--",
     avgWorkHours: "0"
   });
+
 const handleExport = async () => {
   const token = localStorage.getItem("token");
   const base = import.meta.env.VITE_API_URL;

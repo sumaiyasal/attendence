@@ -19,10 +19,10 @@ function App() {
 
   // Filter state
   const [filter, setFilter] = useState({ months: [], year: "", employees: [] });
-
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
   }
+  console.log(filter);
 const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false); 
@@ -38,7 +38,8 @@ const handleLogout = () => {
         {/* Main Content */}
         <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out bg-[#f6f8fb]`}>
           <main className={`flex-1 ${isOpen ? "ml-64" : "ml-0"}`}>
-            <Outlet context={{ filter }} /> 
+          
+            <Content filter={filter}></Content>
           </main>
         </div>
       </div>
